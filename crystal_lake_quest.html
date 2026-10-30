@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Табір "Кришталеве Озеро" — Текстовий Квест</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .font-horror {
+            font-family: 'Creepster', cursive;
+        }
+        
+        /* Dark Theme Default */
+        body.dark-theme {
+            background-color: #090a0f;
+            color: #e2e8f0;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(185, 28, 28, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(30, 58, 138, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Light Theme Options */
+        body.light-theme {
+            background-color: #f8fafc;
+            color: #1e293b;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(254, 202, 202, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(191, 219, 254, 0.4) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        body.light-theme header {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-color: rgba(226, 232, 240, 0.8);
+        }
+
+        body.light-theme .bg-card-bg {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-color: #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .text-main {
+            color: #0f172a;
+        }
+
+        body.light-theme .text-muted {
+            color: #64748b;
+        }
+
+        body.light-theme .bg-inv-active {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        body.light-theme .bg-inv-inactive {
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        body.light-theme .choice-btn {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+            color: #1e293b;
+        }
+
+        body.light-theme .choice-btn:hover {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        body.light-theme .input-field {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ef4444;
+        }
+
+        /* Glitch text effect for game title */
+        .glitch-text {
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+
+        /* Pulse animation for items */
+        .item-active {
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body class="dark-theme min-h-screen flex flex-col justify-between selection:bg-red-900 selection:text-white transition-colors duration-300">
+
+    <!-- Header / Navbar -->
+    <header class="w-full border-b border-red-950/60 bg-black/40 backdrop-blur-md px-4 py-3 sticky top-0 z-50 transition-colors duration-300">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid font-horror text-2xl text-red-600 fa-skull"></i>
+                <h1 class="font-horror text-2xl sm:text-3xl text-red-600 tracking-wider glitch-text">Кришталеве Озеро</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="theme-toggle-btn" class="text-xs sm:text-sm bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-sun text-amber-400" id="theme-icon"></i>
+                    <span id="theme-text">Світла</span>
+                </button>
+                <button id="restart-btn" class="text-xs sm:text-sm bg-red-950/80 hover:bg-red-800 text-red-200 border border-red-800/50 px-3 py-1.5 rounded-lg transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-right"></i> Спочатку
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col gap-6">
+
+        <!-- Top Status & Inventory Panel -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- Hero Info Card -->
+            <div class="bg-card-bg bg-slate-900/80 border border-slate-800 rounded-xl p-3 sm:p-4 backdrop-blur shadow-lg flex items-center justify-between transition-colors duration-300">
+                <div>
+                    <div class="text-xs uppercase text-muted text-slate-400 font-semibold tracking-wider">Герой</div>
+                    <div id="status-name" class="font-bold text-main text-slate-200 text-lg truncate max-w-[120px]">Невідомий</div>
+                    <div id="status-class" class="text-xs text-red-500 font-medium">Клас не вибрано</div>
+                </div>
+                <div class="text-right">
+                    <span id="status-badge" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800/50">
+                        <i class="fa-solid fa-heart mr-1 text-[10px]"></i> Живий
+                    </span>
+                </div>
+            </div>
+
+            <!-- Inventory Card (Spans 2 cols on medium+) -->
+            <div class="sm:col-span-2 bg-card-bg bg-slate-900/80 border border-slate-800 rounded-xl p-3 sm:p-4 backdrop-blur shadow-lg transition-colors duration-300">
+                <div class="text-xs uppercase text-muted text-slate-400 font-semibold tracking-wider mb-2">Інвентар</div>
+                <div class="grid grid-cols-6 gap-2" id="inventory-grid">
+                    <!-- Items rendered dynamically via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Story Display Window -->
+        <div class="bg-card-bg bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 sm:p-7 backdrop-blur shadow-2xl flex-grow flex flex-col justify-between relative overflow-hidden min-h-[360px] transition-colors duration-300">
+            <!-- Decorative corner elements -->
+            <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-red-800/40 rounded-tl-xl"></div>
+            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-red-800/40 rounded-br-xl"></div>
+
+            <!-- Story Text Logs Container -->
+            <div id="story-container" class="space-y-4 mb-6 overflow-y-auto max-h-[380px] pr-2">
+                <!-- Story nodes appended here -->
+            </div>
+
+            <!-- Action Controls Area -->
+            <div id="controls-area" class="border-t border-slate-800/80 pt-4 mt-auto">
+                <!-- Choice buttons or text inputs will be rendered here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 border-t border-slate-800/40 text-muted text-slate-500 text-xs">
+        <p>Кришталеве Озеро — Атмосферний текстовий квест | Адаптована версія</p>
+    </footer>
+
+    <!-- Game Logic Script -->
+    <script>
+        // Theme Management
+        let isDarkTheme = true;
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            if (isDarkTheme) {
+                document.body.classList.remove('light-theme');
+                document.body.classList.add('dark-theme');
+                themeIcon.className = 'fa-solid fa-sun text-amber-400';
+                themeText.textContent = 'Світла';
+                themeToggleBtn.className = 'text-xs sm:text-sm bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg transition duration-200 flex items-center gap-1.5';
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.body.classList.add('light-theme');
+                themeIcon.className = 'fa-solid fa-moon text-indigo-600';
+                themeText.textContent = 'Темна';
+                themeToggleBtn.className = 'text-xs sm:text-sm bg-slate-200 hover:bg-slate-300 text-slate-800 border border-slate-300 px-3 py-1.5 rounded-lg transition duration-200 flex items-center gap-1.5';
+            }
+            updateInventoryUI();
+        }
+
+        themeToggleBtn.onclick = toggleTheme;
+
+        // Game State Object
+        const gameState = {
+            heroName: "",
+            heroClass: "",
+            alive: true,
+            key: false,
+            aidkit: false,
+            flashlight: false,
+            hammer: false,
+            gold: false,
+            step: 'START',
+            safeAttempts: 2
+        };
+
+        // Inventory Items Metadata
+        const itemsConfig = {
+            aidkit: { name: "Аптечка", icon: "fa-kit-medical", color: "text-emerald-500" },
+            flashlight: { name: "Ліхтарик", icon: "fa-flashlight", color: "text-amber-500" },
+            hammer: { name: "Молоток", icon: "fa-hammer", color: "text-slate-500" },
+            key: { name: "Ключ", icon: "fa-key", color: "text-yellow-500" },
+            gold: { name: "Золото", icon: "fa-coins", color: "text-amber-500" }
+        };
+
+        // DOM Elements
+        const storyContainer = document.getElementById('story-container');
+        const controlsArea = document.getElementById('controls-area');
+        const statusName = document.getElementById('status-name');
+        const statusClass = document.getElementById('status-class');
+        const statusBadge = document.getElementById('status-badge');
+        const inventoryGrid = document.getElementById('inventory-grid');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Render Inventory UI
+        function updateInventoryUI() {
+            inventoryGrid.innerHTML = '';
+            Object.keys(itemsConfig).forEach(key => {
+                const hasItem = gameState[key];
+                const config = itemsConfig[key];
+                
+                const itemEl = document.createElement('div');
+                
+                let activeClasses = isDarkTheme 
+                    ? 'bg-slate-800/80 border-slate-600 text-slate-200 item-active' 
+                    : 'bg-inv-active border-slate-300 text-slate-800 item-active';
+                
+                let inactiveClasses = isDarkTheme 
+                    ? 'bg-slate-950/40 border-slate-900 text-slate-700' 
+                    : 'bg-inv-inactive border-slate-200 text-slate-400';
+
+                itemEl.className = `flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-300 ${
+                    hasItem ? activeClasses : inactiveClasses
+                }`;
+                itemEl.innerHTML = `
+                    <i class="fa-solid ${config.icon} text-lg ${hasItem ? config.color : (isDarkTheme ? 'text-slate-700' : 'text-slate-300')}"></i>
+                    <span class="text-[10px] mt-1 truncate max-w-full font-medium">${config.name}</span>
+                `;
+                inventoryGrid.appendChild(itemEl);
+            });
+        }
+
+        // Update Hero Status Badge
+        function updateStatusUI() {
+            statusName.textContent = gameState.heroName || "Невідомий";
+            statusClass.textContent = gameState.heroClass ? `Клас: ${gameState.heroClass}` : "Клас не обрано";
+
+            if (!gameState.alive) {
+                statusBadge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-950 text-red-400 border border-red-800/50";
+                statusBadge.innerHTML = `<i class="fa-solid fa-skull mr-1 text-[10px]"></i> Мертвий`;
+            } else {
+                statusBadge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800/50";
+                statusBadge.innerHTML = `<i class="fa-solid fa-heart mr-1 text-[10px]"></i> Живий`;
+            }
+        }
+
+        // Add Text Segment to Story Area
+        function appendStoryText(text, type = 'normal') {
+            const p = document.createElement('p');
+            p.className = 'leading-relaxed text-sm sm:text-base animate-fade-in ';
+            
+            if (type === 'highlight') {
+                p.className += 'text-red-500 font-semibold border-l-2 border-red-600 pl-3 py-1 bg-red-500/10 rounded-r-lg';
+            } else if (type === 'death') {
+                p.className += 'text-red-600 font-bold bg-red-500/15 p-3 rounded-lg border border-red-600/40 text-center text-lg';
+            } else if (type === 'ending') {
+                p.className += 'text-amber-600 dark:text-amber-300 font-bold bg-amber-500/10 p-4 rounded-xl border border-amber-500/40 text-center text-xl glitch-text';
+            } else if (type === 'success') {
+                p.className += 'text-emerald-600 dark:text-emerald-400 border-l-2 border-emerald-500 pl-3 py-1 bg-emerald-500/10 rounded-r-lg font-medium';
+            } else {
+                p.className += isDarkTheme ? 'text-slate-300' : 'text-slate-700';
+            }
+
+            p.innerText = text;
+            storyContainer.appendChild(p);
+            storyContainer.scrollTop = storyContainer.scrollHeight;
+        }
+
+        // Render Action Buttons
+        function setChoices(choices) {
+            controlsArea.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn w-full py-2.5 px-4 bg-slate-800 hover:bg-red-900/80 hover:border-red-600 text-slate-200 border border-slate-700 rounded-xl transition duration-200 text-sm sm:text-base font-medium flex items-center justify-between group shadow-sm active:scale-[0.98]';
+                btn.innerHTML = `
+                    <span>${choice.text}</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-red-400 transition-transform group-hover:translate-x-1"></i>
+                `;
+                btn.onclick = () => choice.action();
+                grid.appendChild(btn);
+            });
+
+            controlsArea.appendChild(grid);
+        }
+
+        // Render Text Input Controls
+        function setTextInput(placeholder, buttonText, onSubmit) {
+            controlsArea.innerHTML = '';
+            const form = document.createElement('form');
+            form.className = 'flex gap-2 flex-col sm:flex-row';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = placeholder;
+            input.className = 'input-field flex-grow px-4 py-2.5 bg-slate-950 border border-slate-700 focus:border-red-600 rounded-xl outline-none text-sm sm:text-base transition';
+            
+            const btn = document.createElement('button');
+            btn.type = 'submit';
+            btn.className = 'px-6 py-2.5 bg-red-700 hover:bg-red-600 text-white font-medium rounded-xl transition text-sm sm:text-base shadow-md active:scale-[0.98]';
+            btn.innerText = buttonText;
+
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const val = input.value.trim();
+                if (val) {
+                    onSubmit(val);
+                }
+            };
+
+            form.appendChild(input);
+            form.appendChild(btn);
+            controlsArea.appendChild(form);
+            input.focus();
+        }
+
+        // Game Flow & Step Handler
+        function renderStep(step) {
+            gameState.step = step;
+            updateInventoryUI();
+            updateStatusUI();
+
+            switch (step) {
+                case 'START':
+                    storyContainer.innerHTML = '';
+                    appendStoryText('Ласкаво просимо до атмосферного квесту "Кришталеве Озеро".');
+                    setTextInput('Введи ім\'я свого героя...', 'Розпочати', (name) => {
+                        gameState.heroName = name;
+                        renderStep('INTRO');
+                    });
+                    break;
+
+                case 'INTRO':
+                    appendStoryText(`${gameState.heroName}, ти приїхав у табір "Кришталеве озеро", у якому колись відбувалися загадкові та криваві вбивства...`, 'highlight');
+                    appendStoryText('Перш ніж ступити на територію, обери свій клас:');
+                    setChoices([
+                        { text: 'Вожатий (Отримує Аптечку)', action: () => selectClass('вожатий') },
+                        { text: 'Мирний (Отримує Ліхтарик)', action: () => selectClass('мирний') },
+                        { text: 'Загадковий персонаж (Отримує Молоток)', action: () => selectClass('загадковий персонаж') }
+                    ]);
+                    break;
+
+                case 'PATH_SELECTION':
+                    appendStoryText('Ти йдеш до табору. Перед тобою 3 стежки: прямо, наліво та направо.');
+                    setChoices([
+                        { text: 'Йти прямо', action: () => handlePath('прямо') },
+                        { text: 'Повернути наліво (у ліс)', action: () => handlePath('наліво') },
+                        { text: 'Повернути направо', action: () => handlePath('направо') }
+                    ]);
+                    break;
+
+                case 'FOREST_FORESTER':
+                    appendStoryText('Ти заходиш у густий темний ліс, де зустрічаєш дивакуватого лісника. Він пропонує провести тебе до табору. Погодишся?');
+                    setChoices([
+                        { text: 'Так, погодитися', action: () => handleForesterOffer(true) },
+                        { text: 'Ні, відмовитися', action: () => handleForesterOffer(false) }
+                    ]);
+                    break;
+
+                case 'FORESTER_HAMMER_DECISION':
+                    appendStoryText('Лісник поводиться підозріло і дістає ніж! Використати молоток, щоб захиститися?');
+                    setChoices([
+                        { text: 'Так, використати молоток!', action: () => handleHammerFight(true) },
+                        { text: 'Ні, сподіватися на диво', action: () => handleHammerFight(false) }
+                    ]);
+                    break;
+
+                case 'FORESTER_FLASHLIGHT_DECISION':
+                    appendStoryText('Лісник раптово виявляє агресію! Що будеш робити?');
+                    setChoices([
+                        { text: 'Втекти', action: () => handleFlashlightAction('втекти') },
+                        { text: 'Битися голими руками', action: () => handleFlashlightAction('битися') }
+                    ]);
+                    break;
+
+                case 'FORESTER_FLASHLIGHT_ESCAPE':
+                    appendStoryText('Ти тікаєш від лісника, надворі непроглядна ніч. Використати ліхтарик, щоб знайти дорогу?');
+                    setChoices([
+                        { text: 'Так, увімкнути ліхтарик', action: () => handleFlashlightUse(true) },
+                        { text: 'Ні, йти у темряві', action: () => handleFlashlightUse(false) }
+                    ]);
+                    break;
+
+                case 'ROOM_SELECTION':
+                    appendStoryText('Дійшовши до табору, тобі пропонують на вибір 3 кімнати (1, 2 і 3). В яку заселишся?');
+                    setChoices([
+                        { text: 'Кімната №1', action: () => chooseRoom(1) },
+                        { text: 'Кімната №2', action: () => chooseRoom(2) },
+                        { text: 'Кімната №3', action: () => chooseRoom(3) }
+                    ]);
+                    break;
+
+                case 'ROOM_1_OBJECT':
+                    appendStoryText('Ти увійшов у темну кімнату та знайшов дуже дивний предмет, який тривожно пікає. Твої дії?');
+                    setChoices([
+                        { text: 'Викинути через вікно', action: () => handleBomb('викинути') },
+                        { text: 'Спробувати розібрати', action: () => handleBomb('розібрати') },
+                        { text: 'Нічого не робити', action: () => handleBomb('нічого') }
+                    ]);
+                    break;
+
+                case 'ROOM_3_SAFE':
+                    appendStoryText('У шафі ти знаходиш старий сейф із запискою: "Що має багато клавіш, але не відчиняє жодних дверей?" Нижче надпис: у тебе 2 спроби.');
+                    promptSafePassword();
+                    break;
+
+                case 'MAZE_ENTRANCE':
+                    appendStoryText('--- НАСТУПНИЙ ДЕНЬ ---', 'highlight');
+                    appendStoryText('На прогулянці з групою ти відстаєш. Повернувши стежкою не туди, ти помічаєш перед собою таємничий лабіринт.');
+                    appendStoryText('Бачиш 3 шляхи: Червоний (швидкий, але дуже небезпечний), Зелений (довгий, але безпечний), Синій (невідомо).');
+                    setChoices([
+                        { text: 'Червоний шлях', action: () => handleMaze('червоний') },
+                        { text: 'Зелений шлях', action: () => handleMaze('зелений') },
+                        { text: 'Синій шлях', action: () => handleMaze('синій') }
+                    ]);
+                    break;
+
+                case 'MAZE_BLUE_PATH':
+                    appendStoryText('Ти йдеш по темному коридору і бачиш поворот наліво. Підеш туди?');
+                    setChoices([
+                        { text: 'Так, повернути наліво', action: () => handleBlueTurn(true) },
+                        { text: 'Ні, йти прямо', action: () => handleBlueTurn(false) }
+                    ]);
+                    break;
+
+                case 'GAME_OVER':
+                    calculateEnding();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        // Logic Functions
+        function selectClass(cls) {
+            gameState.heroClass = cls;
+            if (cls === 'вожатий') {
+                gameState.aidkit = true;
+                appendStoryText('У персонажа з\'явилася Аптечка!', 'success');
+            } else if (cls === 'мирний') {
+                gameState.flashlight = true;
+                appendStoryText('У персонажа з\'явився Ліхтарик!', 'success');
+            } else if (cls === 'загадковий персонаж') {
+                gameState.hammer = true;
+                appendStoryText('У персонажа з\'явився Молоток!', 'success');
+            }
+            renderStep('PATH_SELECTION');
+        }
+
+        function handlePath(dir) {
+            if (dir === 'прямо') {
+                appendStoryText('Ти доходиш до шосе, де добрі люди підвозять тебе прямо до воріт табору.');
+                renderStep('ROOM_SELECTION');
+            } else if (dir === 'наліво') {
+                renderStep('FOREST_FORESTER');
+            } else {
+                appendStoryText('Стежка направо виявилася тупиком. Поблукавши, ти повертаєшся і приходиш до табору.');
+                renderStep('ROOM_SELECTION');
+            }
+        }
+
+        function handleForesterOffer(accepted) {
+            if (accepted) {
+                if (gameState.hammer) {
+                    renderStep('FORESTER_HAMMER_DECISION');
+                } else if (gameState.flashlight) {
+                    renderStep('FORESTER_FLASHLIGHT_DECISION');
+                } else if (gameState.heroClass === 'вожатий') {
+                    appendStoryText('Лісник впізнає у тобі вожатого і безпечно відводить тебе до табору.');
+                    renderStep('ROOM_SELECTION');
+                } else {
+                    appendStoryText('Лісник виявився божевільним маніяком! У тебе немає зброї, щоб захиститися...', 'highlight');
+                    playerDie('Лісник вбиває тебе у хащах лісу.');
+                }
+            } else {
+                appendStoryText('Ти відмовляєшся від допомоги. Трохи поблукавши по лісу, ти самостійно добираєшся до табору.');
+                renderStep('ROOM_SELECTION');
+            }
+        }
+
+        function handleHammerFight(useHammer) {
+            if (useHammer) {
+                appendStoryText('Ти спритно відбиваєшся від лісника за допомогою молотка!', 'success');
+                appendStoryText('Після цього, трохи поблукавши по лісу, ти виходиш до табору.');
+                renderStep('ROOM_SELECTION');
+            } else {
+                playerDie('Лісник напав на тебе. Ти не захищався і загинув.');
+            }
+        }
+
+        function handleFlashlightAction(action) {
+            if (action === 'втекти') {
+                renderStep('FORESTER_FLASHLIGHT_ESCAPE');
+            } else {
+                playerDie('Спроба битися проти озброєного лісника голими руками була смертельною помилкою.');
+            }
+        }
+
+        function handleFlashlightUse(useFlashlight) {
+            if (useFlashlight) {
+                appendStoryText('Яскраве світло ліхтарика допомагає тобі знайти стежку і безпечно дістатися табору!', 'success');
+                renderStep('ROOM_SELECTION');
+            } else {
+                playerDie('В темноті ти не помічаєш, як повертаєшся на те ж місце. Лісник підкрадається ззаду і вбиває тебе.');
+            }
+        }
+
+        function chooseRoom(num) {
+            if (num === 1) {
+                renderStep('ROOM_1_OBJECT');
+            } else if (num === 2) {
+                appendStoryText('Ти заселився в затишну кімнату №2, спокійно відпочив та ліг на ліжко.');
+                renderStep('MAZE_ENTRANCE');
+            } else if (num === 3) {
+                gameState.safeAttempts = 2;
+                renderStep('ROOM_3_SAFE');
+            }
+        }
+
+        function handleBomb(action) {
+            if (action === 'викинути') {
+                appendStoryText('Ти швидко викидаєш предмет через вікно. Через декілька секунд надворі лунає гучний ВУБУХ! З тобою все добре.', 'success');
+                renderStep('MAZE_ENTRANCE');
+            } else if (action === 'розібрати') {
+                playerDie('Ти пробуєш зняти задню кришку, придавлюєш трохи сильніше і... ВУБУХ! Ти помираєш.');
+            } else {
+                playerDie('Ти вирішуєш залишити все як є. Проходить 10 хвилин і... ВИБУХ! Ти помираєш.');
+            }
+        }
+
+        function promptSafePassword() {
+            setTextInput('Введи слово-пароль...', 'Відчинити', (ans) => {
+                const cleanAns = ans.toLowerCase().trim();
+                if (cleanAns === 'клавіатура') {
+                    gameState.gold = true;
+                    updateInventoryUI();
+                    appendStoryText('Пароль вірний! Сейф зі брязкотом відчиняється, а в ньому блищить ЗОЛОТО!', 'success');
+                    renderStep('MAZE_ENTRANCE');
+                } else {
+                    gameState.safeAttempts--;
+                    if (gameState.safeAttempts > 0) {
+                        appendStoryText(`Пароль невірний! Залишилась ще ${gameState.safeAttempts} спроба.`, 'highlight');
+                        promptSafePassword();
+                    } else {
+                        appendStoryText('Пароль невірний. Всі спроби вичерпані, сейф заблокувався.');
+                        renderStep('MAZE_ENTRANCE');
+                    }
+                }
+            });
+        }
+
+        function handleMaze(color) {
+            if (color === 'червоний') {
+                if (gameState.aidkit) {
+                    appendStoryText('Йдучи небезпечним лабіринтом, ти глибоко раниш ногу. За допомогою аптечки ти швидко надаєш собі допомогу та продовжуєш шлях.', 'success');
+                    appendStoryText('Ти успішно виходиш з лабіринту!');
+                    renderStep('GAME_OVER');
+                } else {
+                    playerDie(`Йдучи лабіринтом, ${gameState.heroName || "персонаж"} сильно ранить ногу. Без аптечки продовжити шлях неможливо...`);
+                }
+            } else if (color === 'зелений') {
+                appendStoryText('Ти довго і виснажливо йдеш безпечним лабіринтом, але врешті-решт виходиш з нього.');
+                renderStep('GAME_OVER');
+            } else if (color === 'синій') {
+                renderStep('MAZE_BLUE_PATH');
+            }
+        }
+
+        function handleBlueTurn(turnLeft) {
+            if (turnLeft) {
+                gameState.key = true;
+                updateInventoryUI();
+                appendStoryText('Наприкінці тупика ти знаходиш старовинний КЛЮЧ! Після цього ти повертаєшся на основну дорогу і виходиш з лабіринту.', 'success');
+            } else {
+                appendStoryText('Ти проходиш повз коридор і виходиш з лабіринту.');
+            }
+            renderStep('GAME_OVER');
+        }
+
+        function playerDie(reason) {
+            gameState.alive = false;
+            updateStatusUI();
+            appendStoryText(reason, 'death');
+            renderStep('GAME_OVER');
+        }
+
+        function calculateEnding() {
+            controlsArea.innerHTML = '';
+
+            if (!gameState.alive) {
+                appendStoryText("Ти отримав фінал: 'ЦІНОЮ В ЖИТТЯ'", 'death');
+            } else {
+                if (gameState.key) {
+                    if (gameState.gold) {
+                        appendStoryText("Ти отримав фінал: 'ЛЕГЕНДА МІСТА' (Ти знайшов і ключ, і золото, і вижив!)", 'ending');
+                    } else {
+                        appendStoryText("Ти отримав фінал: 'РЯТІВНИК' (Таємничий ключ відкрив нові секрети табору!)", 'ending');
+                    }
+                } else {
+                    if (gameState.gold) {
+                        appendStoryText("Ти отримав фінал: 'БАГАТИЙ УТІКАЧ' (Ти вибрався живим та ще й із золотом!)", 'ending');
+                    } else {
+                        appendStoryText("Ти отримав фінал: 'DARK CITY' (Ти вижив, але табір залишив по собі лише морок...)", 'ending');
+                    }
+                }
+            }
+
+            const restartCardBtn = document.createElement('button');
+            restartCardBtn.className = 'w-full py-3 mt-4 bg-red-700 hover:bg-red-600 text-white font-bold rounded-xl transition text-base shadow-lg active:scale-[0.98] flex items-center justify-center gap-2';
+            restartCardBtn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Почати гру спочатку`;
+            restartCardBtn.onclick = resetGame;
+            controlsArea.appendChild(restartCardBtn);
+        }
+
+        function resetGame() {
+            gameState.heroName = "";
+            gameState.heroClass = "";
+            gameState.alive = true;
+            gameState.key = false;
+            gameState.aidkit = false;
+            gameState.flashlight = false;
+            gameState.hammer = false;
+            gameState.gold = false;
+            gameState.safeAttempts = 2;
+
+            renderStep('START');
+        }
+
+        // Global Restart Button Handler
+        restartBtn.onclick = resetGame;
+
+        // Init Game on Load
+        window.onload = () => {
+            renderStep('START');
+        };
+    </script>
+</body>
+</html>
